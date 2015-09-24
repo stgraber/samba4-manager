@@ -18,8 +18,10 @@
 
 from libs.common import iri_for as url_for
 from flask import abort, flash, g, render_template, redirect, request
-from flask.ext.wtf import EqualTo, Form, PasswordField, Required, \
-    SelectMultipleField, TextAreaField, TextField
+from flask.ext.wtf import Form
+from wtforms import PasswordField, SelectMultipleField, TextAreaField, TextField
+from wtforms.validators import Required,  EqualTo
+
 
 from libs.ldap_func import ldap_auth, ldap_change_password, \
     ldap_create_entry, ldap_delete_entry, ldap_get_user, \
