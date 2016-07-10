@@ -44,7 +44,8 @@ LDAP_AD_USERACCOUNTCONTROL_VALUES = {2: ("Account is disabled", True),
 LDAP_AD_BOOL_ATTRIBUTES = ['showInAdvancedViewOnly']
 LDAP_AD_GUID_ATTRIBUTES = ['objectGUID']
 LDAP_AD_MULTIVALUE_ATTRIBUTES = ['member', 'memberOf', 'objectClass', 'repsTo',
-                                 'servicePrincipalName', 'sshPublicKey']
+                                 'servicePrincipalName', 'sshPublicKey',
+                                 'managedObjects', 'proxyAddresses']
 LDAP_AD_SID_ATTRIBUTES = ['objectSid']
 LDAP_AD_UINT_ATTRIBUTES = ['userAccountControl', 'groupType']
 
