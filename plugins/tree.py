@@ -43,7 +43,7 @@ def init(app):
         entries = []
         for entry in sorted(ldap_get_entries("objectClass=top", base,
                             "onelevel"), key=lambda entry: entry['name']):
-            if not 'description' in entry:
+            if 'description' not in entry:
                 if 'displayName' in entry:
                     entry['__description'] = entry['displayName']
             else:

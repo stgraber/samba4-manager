@@ -55,7 +55,7 @@ def ldap_change_password(old_password, new_password, username=None):
         Change the password of the user.
     """
 
-    if not 'connection' in g.ldap:
+    if 'connection' not in g.ldap:
         return False
 
     connection = g.ldap['connection']
@@ -83,7 +83,7 @@ def ldap_create_entry(dn, attributes):
         Create a new entry and set the attributes passed as parameter.
     """
 
-    if not 'connection' in g.ldap:
+    if 'connection' not in g.ldap:
         return False
 
     connection = g.ldap['connection']
@@ -107,7 +107,7 @@ def ldap_delete_entry(dn):
         Delete an entry as identified by its distinguishedName.
     """
 
-    if not 'connection' in g.ldap:
+    if 'connection' not in g.ldap:
         return False
 
     connection = g.ldap['connection']
@@ -151,7 +151,7 @@ def ldap_get_entry_simple(filter_dict):
 
     for entry in g.ldap_cache.values():
         for key, value in filter_dict.items():
-            if not key in entry:
+            if key not in entry:
                 break
 
             if isinstance(entry[key], list):
@@ -198,7 +198,7 @@ def ldap_get_entries(ldap_filter, base=None, scope=None):
         False on errors.
     """
 
-    if not 'connection' in g.ldap:
+    if 'connection' not in g.ldap:
         return False
 
     if not base:
@@ -329,7 +329,7 @@ def ldap_update_attribute(dn, attribute, value, objectclass=None):
         Set/Update a given attribute.
     """
 
-    if not 'connection' in g.ldap:
+    if 'connection' not in g.ldap:
         return False
 
     connection = g.ldap['connection']

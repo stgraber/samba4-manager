@@ -68,7 +68,7 @@ if 'URL_PREFIX' in app.config:
 
 # Check for mandatory configuration
 for key in ("LDAP_DOMAIN", "SECRET_KEY"):
-    if not key in app.config:
+    if key not in app.config:
         raise KeyError("Missing mandatory %s option in configuration." % key)
 
 # LDAP configuration
