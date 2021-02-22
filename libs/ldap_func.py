@@ -19,6 +19,7 @@
 from flask import request, Response, g, session
 from functools import wraps
 import ldap
+import ldap.modlist
 import struct
 import uuid
 
@@ -87,18 +88,15 @@ def ldap_create_entry(dn, attributes):
         return False
 
     connection = g.ldap['connection']
-    dn = dn.encode('utf-8')
 
-    attr = []
+    attrs = {}
     for key, value in attributes.items():
         if isinstance(value, list):
-            for entry in value:
-                attr.append((key.encode('utf-8'), entry.encode('utf-8')))
+            attrs[key] = value.encode('utf-8')
         else:
-            attr.append((key.encode('utf-8'), value.encode('utf-8')))
+            attrs[key] = [value.encode('utf-8')]
 
-    connection.add_s(dn, attr)
-
+    connection.add_s(dn, ldap.modlist.addModlist(attrs))
     return True
 
 
@@ -111,7 +109,6 @@ def ldap_delete_entry(dn):
         return False
 
     connection = g.ldap['connection']
-    dn = dn.encode('utf-8')
 
     connection.delete_s(dn)
 
@@ -167,7 +164,7 @@ def ldap_get_entry_simple(filter_dict):
 
     ldap_filter = ""
     if len(filter_dict) == 1:
-        ldap_filter = "%s=%s" % filter_dict.items()[0]
+        ldap_filter = "%s=%s" % list(filter_dict.items())[0]
     else:
         fields = ""
         for key, value in filter_dict.items():
@@ -334,8 +331,7 @@ def ldap_update_attribute(dn, attribute, value, objectclass=None):
 
     connection = g.ldap['connection']
 
-    dn = dn.encode('utf-8')
-    attribute = attribute.encode('utf-8')
+    attribute = attribute
     current_entry = ldap_get_entry_simple({'distinguishedName': dn})
 
     if not current_entry:
@@ -345,7 +341,7 @@ def ldap_update_attribute(dn, attribute, value, objectclass=None):
 
     if dn.lower().startswith("%s=" % attribute.lower()):
         # It's a rename, not an attribute update
-        connection.rename_s(dn, "%s=%s" % (attribute, value.encode('utf-8')))
+        connection.rename_s(dn, "%s=%s" % (attribute, value))
         return True
 
     if objectclass and objectclass not in current_entry['objectClass']:
@@ -366,8 +362,7 @@ def ldap_update_attribute(dn, attribute, value, objectclass=None):
         changes.append((ldap.MOD_DELETE, attribute, None))
     elif attribute in current_entry:
         # Update current attribute
-        changes.append((ldap.MOD_REPLACE, attribute,
-                        value.encode('utf-8')))
+        changes.append((ldap.MOD_REPLACE, attribute, value.encode('utf-8')))
     elif value:
         # Add the attribute
         changes.append((ldap.MOD_ADD, attribute, value.encode('utf-8')))
@@ -451,18 +446,18 @@ def _ldap_connect(username, password):
 
 
 def _ldap_sid2str(sid):
-    srl = ord(sid[0])
-    number_sub_id = ord(sid[1])
-    iav = struct.unpack('!Q', '\x00\x00' + sid[2:8])[0]
+    srl = struct.unpack('B', sid[0:1])[0]
+    number_sub_id = struct.unpack('B', sid[1:2])[0]
+    iav = struct.unpack(b'>Q', b'\x00\x00' + sid[2:8])[0]
     sub_ids = [struct.unpack('<I', sid[8 + 4 * i: 12 + 4 * i])[0]
                for i in range(number_sub_id)]
 
-    return 'S-%d-%d-%s' % (
+    ret = 'S-%d-%d-%s' % (
         srl,
         iav,
         '-'.join([str(s) for s in sub_ids]),
     )
-
+    return ret.encode('utf-8')
 
 def _ldap_decode_attribute(key, value):
     # Handle multi-value attributes
@@ -481,7 +476,7 @@ def _ldap_decode_attribute(key, value):
 
     # Decode GUIID values
     if key in LDAP_AD_GUID_ATTRIBUTES:
-        return str(uuid.UUID(bytes_le=value)).decode('utf-8')
+        return str(uuid.UUID(bytes_le=value))
 
     # Decode Unsigned Integer values
     if key in LDAP_AD_UINT_ATTRIBUTES:

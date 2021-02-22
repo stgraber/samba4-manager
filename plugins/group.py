@@ -18,7 +18,7 @@
 
 from libs.common import iri_for as url_for
 from flask import abort, flash, g, render_template, redirect, request
-from flask.ext.wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import RadioField, TextAreaField, TextField
 from wtforms.validators import Required
 
@@ -31,11 +31,11 @@ import ldap
 import struct
 
 
-class GroupAddMembers(Form):
+class GroupAddMembers(FlaskForm):
     new_members = TextAreaField('New members')
 
 
-class GroupEdit(Form):
+class GroupEdit(FlaskForm):
     name = TextField('Name', [Required()])
     description = TextField('Description')
     group_type = RadioField('Type',
@@ -150,7 +150,7 @@ def init(app):
         if not ldap_group_exists(groupname):
             abort(404)
 
-        form = Form(request.form)
+        form = FlaskForm(request.form)
 
         if form.validate_on_submit():
             try:
@@ -309,7 +309,7 @@ def init(app):
         if not member['distinguishedName'] in group['member']:
             abort(404)
 
-        form = Form(request.form)
+        form = FlaskForm(request.form)
 
         if form.validate_on_submit():
             try:

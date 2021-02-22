@@ -18,7 +18,7 @@
 
 from libs.common import iri_for as url_for
 from flask import abort, flash, g, render_template, redirect, request
-from flask.ext.wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import PasswordField, SelectMultipleField, TextAreaField, \
     TextField
 from wtforms.validators import Required,  EqualTo
@@ -32,11 +32,11 @@ from libs.ldap_func import ldap_auth, ldap_change_password, \
 import ldap
 
 
-class UserSSHEdit(Form):
+class UserSSHEdit(FlaskForm):
     ssh_keys = TextAreaField('SSH keys')
 
 
-class UserProfileEdit(Form):
+class UserProfileEdit(FlaskForm):
     first_name = TextField('First name')
     last_name = TextField('Last name')
     display_name = TextField('Display name')
@@ -53,7 +53,7 @@ class UserAdd(UserProfileEdit):
                                               message='Passwords must match')])
 
 
-class PasswordChange(Form):
+class PasswordChange(FlaskForm):
     password = PasswordField('New password', [Required()])
     password_confirm = PasswordField('Repeat new password',
                                      [Required(),
@@ -212,7 +212,7 @@ def init(app):
         if not ldap_user_exists(username=username):
             abort(404)
 
-        form = Form(request.form)
+        form = FlaskForm(request.form)
 
         if form.validate_on_submit():
             try:
