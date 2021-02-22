@@ -1,2 +1,5 @@
+build/
+dist/
 manager.cfg
 *.pyc
+*.egg-info/
