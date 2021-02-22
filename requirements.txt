@@ -1,0 +1,5 @@
+dnspython
+python-ldap
+Flask
+Flask-Ext
+Flask-WTF-Ext
