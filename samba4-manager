@@ -20,8 +20,8 @@
 import argparse
 import os
 
-config_file = "/etc/samba4-manager/manager.cfg"
-app_prefix = "/usr/share/samba4-manager/"
+config_file = os.getenv("APP_CONFIG", "/etc/samba4-manager/manager.cfg")
+app_prefix = os.getenv("APP_DATA", "/usr/share/samba4-manager/")
 
 # Check if running from bzr
 for path in ('manager.cfg', 'libs', 'plugins', 'static', 'templates'):
