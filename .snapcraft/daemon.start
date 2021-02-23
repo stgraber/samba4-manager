@@ -1,0 +1,23 @@
+#!/bin/sh -eu
+DOMAIN="$(snapctl get domain)"
+PREFIX="$(snapctl get prefix)"
+[ -z "${PREFIX}"  ] && PREFIX="/"
+
+if [ -z "${DOMAIN}" ]; then
+    echo "samba4-manager hasn't been configured yet, stopping."
+    snapctl stop samba4-manager.daemon
+fi
+
+CONF="${SNAP_DATA}/manager.cfg"
+(
+cat << EOF
+# Auto-generated, don't modify.
+SECRET_KEY="$(uuidgen)"
+LDAP_DOMAIN = "${DOMAIN}"
+DEBUG = False
+URL_PREFIX= "${PREFIX}"
+EOF
+) > "${CONF}"
+
+cd "${SNAP}/app"
+exec ./samba4-manager

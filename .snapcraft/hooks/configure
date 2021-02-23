@@ -1,0 +1,9 @@
+#!/bin/sh -eu
+DOMAIN="$(snapctl get domain)"
+
+if [ -z "${DOMAIN}" ]; then
+    exit 0
+fi
+
+snapctl restart samba4-manager.daemon
+exit 0

@@ -1,0 +1,81 @@
+name: samba4-manager
+base: core20
+version: git
+grade: stable
+summary: Web management interface for samba4
+description: |-
+ Simple web management interface for samba4.
+
+ This allows:
+  - User and group creation
+  - User profile edition
+  - Adding SSH keys (requires schema extension)
+
+ To install:
+  - snap install samba4-manager
+  - snap set samba4-manager domain=YOUR-DOMAIN
+
+ The web server will be running on port 8080.
+
+confinement: strict
+
+apps:
+  daemon:
+    command: daemon.start
+    daemon: simple
+    plugs:
+      - network
+      - network-bind
+
+architectures:
+  - build-on: amd64
+  - build-on: arm64
+  - build-on: armhf
+  - build-on: ppc64el
+  - build-on: s390x
+
+parts:
+  samba4-manager:
+    source: .
+    plugin: python
+    build-packages:
+      - libldap2-dev
+      - libsasl2-dev
+    stage-packages:
+      - libasn1-8-heimdal
+      - libgssapi3-heimdal
+      - libhcrypto4-heimdal
+      - libheimbase1-heimdal
+      - libheimntlm0-heimdal
+      - libhx509-5-heimdal
+      - libkrb5-26-heimdal
+      - libldap-2.4-2
+      - libroken18-heimdal
+      - libsasl2-2
+      - libwind0-heimdal
+      - uuid-runtime
+    organize:
+      usr/bin/: bin/
+
+  static:
+    plugin: dump
+    source: .
+    prime:
+      - app
+    organize:
+      libs/: app/libs/
+      plugins/: app/plugins/
+      samba4-manager: app/samba4-manager
+      static/: app/static/
+      templates/: app/templates/
+    override-build: |
+      snapcraftctl build
+
+      mkdir -p "${SNAPCRAFT_PART_INSTALL}/app/"
+      ln -s /var/snap/samba4-manager/current/manager.cfg "${SNAPCRAFT_PART_INSTALL}/app/manager.cfg"
+
+  wrappers:
+    plugin: dump
+    source: .snapcraft/
+    organize:
+      hooks/: snap/hooks/
