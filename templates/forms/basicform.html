@@ -3,7 +3,7 @@
 {% block content %}
     {% from "forms/macros.html" import render_field %}
 {% if request.query_string %}
-    <form method="post" action="?{{ request.query_string }}" class="form">
+    <form method="post" action="?{{ request.query_string.decode('ascii') }}" class="form">
 {% else %}
     <form method="post" action="?" class="form">
 {% endif %}
