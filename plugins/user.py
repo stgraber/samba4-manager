@@ -20,8 +20,8 @@ from libs.common import iri_for as url_for
 from flask import abort, flash, g, render_template, redirect, request
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, SelectMultipleField, TextAreaField, \
-    TextField
-from wtforms.validators import Required,  EqualTo
+    StringField
+from wtforms.validators import DataRequired,  EqualTo
 
 
 from libs.ldap_func import ldap_auth, ldap_change_password, \
@@ -37,32 +37,32 @@ class UserSSHEdit(FlaskForm):
 
 
 class UserProfileEdit(FlaskForm):
-    first_name = TextField('First name')
-    last_name = TextField('Last name')
-    display_name = TextField('Display name')
-    user_name = TextField('Username', [Required()])
-    mail = TextField('E-mail address')
+    first_name = StringField('First name')
+    last_name = StringField('Last name')
+    display_name = StringField('Display name')
+    user_name = StringField('Username', [DataRequired()])
+    mail = StringField('E-mail address')
     uac_flags = SelectMultipleField('User flags', coerce=int)
 
 
 class UserAdd(UserProfileEdit):
-    password = PasswordField('Password', [Required()])
+    password = PasswordField('Password', [DataRequired()])
     password_confirm = PasswordField('Repeat password',
-                                     [Required(),
+                                     [DataRequired(),
                                       EqualTo('password',
                                               message='Passwords must match')])
 
 
 class PasswordChange(FlaskForm):
-    password = PasswordField('New password', [Required()])
+    password = PasswordField('New password', [DataRequired()])
     password_confirm = PasswordField('Repeat new password',
-                                     [Required(),
+                                     [DataRequired(),
                                       EqualTo('password',
                                               message='Passwords must match')])
 
 
 class PasswordChangeUser(PasswordChange):
-    oldpassword = PasswordField('Current password', [Required()])
+    oldpassword = PasswordField('Current password', [DataRequired()])
 
 
 def init(app):
