@@ -196,8 +196,11 @@ def init(app):
                 flash("Password changed successfuly.", "success")
                 return redirect(url_for('user_overview', username=username))
             except ldap.LDAPError as e:
-                error = e.message['info'].split(":", 2)[-1].strip()
-                error = str(error[0].upper() + error[1:])
+                try:
+                   error = e.message['info'].split(":", 2)[-1].strip()
+                   error = str(error[0].upper() + error[1:])
+                except AttributeError as e:
+                    error = str(e)
                 flash(error, "error")
         elif form.errors:
                 flash("Some fields failed validation.", "error")
